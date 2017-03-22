@@ -1,14 +1,11 @@
 import "babel-polyfill";
 import https from "https";
 
-// StartYourBusiness Credit card payment page ID
-const pageId = "2c92c0f959d961e8015a030562be0c8c";
-
 const failResponse = {
     success: false
 };
 
-function buildResult(url, rsaSignResult) {
+function buildResult(url, rsaSignResult, pageId) {
     if (rsaSignResult.success) {
         rsaSignResult.id = pageId;
         rsaSignResult.url = url;
@@ -23,11 +20,11 @@ exports.handler = function(event, context, callback) {
     console.log("Received event:", JSON.stringify(event, null, 2));
     console.log("Received context:", JSON.stringify(context, null, 2));
 
-    const {zuoraApiHost} = event["stage-variables"];
+    const {zuoraApiHost, zuoraPaymentPageId} = event["stage-variables"];
     const uri = "https://" + zuoraApiHost + "/apps/PublicHostedPageLite.do";
     const postData = JSON.stringify({
         method: "POST",
-        pageId: pageId,
+        pageId: zuoraPaymentPageId,
         uri: uri
     });
 
@@ -48,7 +45,7 @@ exports.handler = function(event, context, callback) {
         });
         res.on("end", () => {
             console.log("Received data:", rawData);
-            callback(null, buildResult(uri, JSON.parse(rawData)));
+            callback(null, buildResult(uri, JSON.parse(rawData), zuoraPaymentPageId));
         });
     });
     req.on("error", e => {
