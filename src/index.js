@@ -20,8 +20,8 @@ exports.handler = function(event, context, callback) {
     console.log("Received event:", JSON.stringify(event, null, 2));
     console.log("Received context:", JSON.stringify(context, null, 2));
 
-    const {zuoraApiHost, zuoraPaymentPageId} = event["stage-variables"];
-    const uri = "https://" + zuoraApiHost + "/apps/PublicHostedPageLite.do";
+    const {zuoraHost, zuoraPaymentPageId} = event["stage-variables"];
+    const uri = "https://" + zuoraHost + "/apps/PublicHostedPageLite.do";
     const postData = JSON.stringify({
         method: "POST",
         pageId: zuoraPaymentPageId,
@@ -35,9 +35,9 @@ exports.handler = function(event, context, callback) {
             "Cache-Control": "no-cache",
             "Content-Length": postData.length
         },
-        hostname: zuoraApiHost,
+        hostname: `rest.${zuoraHost}`,
         method: "POST",
-        path: "/rest/v1/rsa-signatures"
+        path: "/v1/rsa-signatures"
     }, res => {
         let rawData = "";
         res.on("data", data => {
